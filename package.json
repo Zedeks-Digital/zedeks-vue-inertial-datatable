@@ -1,6 +1,6 @@
 {
   "name": "zedeks-vue-inertial-datatable",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Datatable for VILT stack",
   "author": "Melchizedek Logosu (Zedeks)",
   "main": "dist/zedeks-vue-inertial-datatable.ssr.js",
