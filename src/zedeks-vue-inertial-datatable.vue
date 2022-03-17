@@ -200,7 +200,6 @@ export default /*#__PURE__*/defineComponent({
 </script>
 
 <template>
-  <div class="flex justify-center items-center h-screen w-full">
     <div class="w-3/4 rounded-sm bg-white  p-6 shadow">
       <!--      title and create button section-->
       <section class="mb-4 flex justify-between items-center">
@@ -397,8 +396,6 @@ export default /*#__PURE__*/defineComponent({
         <z-pagination :links="getPagination"/>
       </section>
     </div>
-  </div>
-
 </template>
 
 <style scoped>

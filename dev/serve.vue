@@ -1,7 +1,9 @@
 
 <template>
   <div id="app">
+    <div class="flex justify-center items-center h-screen w-full">
     <z-table :backend="backend" />
+    </div>
   </div>
 </template>
 
