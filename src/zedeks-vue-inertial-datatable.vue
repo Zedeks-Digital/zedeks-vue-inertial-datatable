@@ -75,9 +75,10 @@ export default /*#__PURE__*/defineComponent({
     getPagination() {
       if (this.checkForMeta()) {
         return this.backend.data.meta.links
-      } else {
+      } else if(this.contains(this.backend.data,'links')) {
         return this.backend.data.links
       }
+      return [];
     },
     getTableCount() {
       let meta;
@@ -85,8 +86,11 @@ export default /*#__PURE__*/defineComponent({
         meta = this.backend.data.meta
         return ` ${meta.from} to ${meta.to} of ${meta.total}`
       }
-      meta = this.backend.data.links
-      return ` ${meta.from} to ${meta.to} of ${meta.total}`
+      else if(this.contains(this.backend.data,'links')){
+        meta = this.backend.data.links
+        return ` ${meta.from} to ${meta.to} of ${meta.total}`
+      }
+        return ` 1 to ${this.backend.data.length} of ${this.backend.data.length}`
     },
     getHeaders() {
       return this.backend.headers
