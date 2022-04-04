@@ -31,7 +31,7 @@ full code for vue 3 "resources/js/app.js" should look like this.
 import {createApp, h} from 'vue'
 import {createInertiaApp} from '@inertiajs/inertia-vue3'
 
-import ZTable from 'zedeks-vue-inertial-datatable'
+import ZTable from 'zedeks-vue-inertial-datatable' // this place
 import store from "./store/index"
 
 createInertiaApp({
@@ -45,7 +45,7 @@ createInertiaApp({
             })
             .use(plugin)
             .use(store)
-            .component('ZTable',ZTable)
+            .component('ZTable',ZTable) // this place
             .mount(el)
     },
 })
@@ -56,7 +56,9 @@ createInertiaApp({
 ### CSS
 add the following tailwind css classes to you main css file
 ```css
-
+.z-table-wrapper{
+    @apply w-3/4 rounded-sm bg-white  p-6 shadow
+}
 .z-btn{
     @apply bg-blue-600 text-white text-sm font-medium py-3 px-4 rounded-sm ml-1
 }

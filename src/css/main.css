@@ -2,18 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
-.z-btn{
+.z-table-wrapper {
+    @apply w-3/4 rounded-sm bg-white  p-6 shadow
+}
+
+.z-table-loader-wrapper {
+    @apply absolute w-full h-full bg-gray-50 bg-opacity-50 flex justify-center items-center
+}
+
+.z-table-loader-wrapper p {
+    @apply text-xl p-4 bg-gray-200 rounded-md
+}
+
+.z-table {
+    @apply w-full bg-gray-50
+}
+
+.z-table-header {
+    @apply bg-gray-400 text-base font-semibold text-gray-50 text-left
+}
+
+.z-btn {
     @apply bg-blue-600 text-white text-sm font-medium py-3 px-4 rounded-sm ml-1
 }
-.z-btn-sm{
+
+.z-btn-sm {
     @apply bg-blue-600 text-white text-xs font-medium py-1 px-2 rounded-sm ml-1
 }
-.z-btn-pg{
+
+.z-btn-pg {
     @apply bg-blue-600 text-white text-xs font-medium py-1 px-2 ml-0.5
 }
-.z-input{
+
+.z-input {
     @apply rounded-sm w-full p-2 focus:ring-blue-600 focus:outline-none focus:ring focus:ring-opacity-25 bg-gray-50 ring ring-opacity-25 ring-gray-300
 }
-.z-select{
+
+.z-select {
     @apply rounded-sm  p-2 focus:ring-blue-600 focus:outline-none focus:ring focus:ring-opacity-25 bg-gray-50 ring ring-opacity-25 ring-gray-300
+}
+
+.z-tr-no-data {
+    @apply px-16 py-8 h-16 flex justify-center items-center w-full relative
+}
+
+.z-tr-no-data > span {
+    @apply absolute 
 }

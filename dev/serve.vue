@@ -82,38 +82,38 @@ export default defineComponent({
               "name": "Jomoro Municipal"
             },
           ],
-          links: [
-            {
-              "url": null,
-              "label": "&laquo; Previous",
-              "active": false
-            },
-            {
-              "url": "http://clockin.vbox/test?page=1",
-              "label": "1",
-              "active": true
-            },
-            {
-              "url": "http://clockin.vbox/test?page=2",
-              "label": "2",
-              "active": false
-            },
-            {
-              "url": "http://clockin.vbox/test?page=3",
-              "label": "3",
-              "active": false
-            },
-            {
-              "url": "http://clockin.vbox/test?page=4",
-              "label": "4",
-              "active": false
-            },
-            {
-              "url": "http://clockin.vbox/test?page=5",
-              "label": "5",
-              "active": false
-            },
-          ],
+          // links: [
+          //   {
+          //     "url": null,
+          //     "label": "&laquo; Previous",
+          //     "active": false
+          //   },
+          //   {
+          //     "url": "http://clockin.vbox/test?page=1",
+          //     "label": "1",
+          //     "active": true
+          //   },
+          //   {
+          //     "url": "http://clockin.vbox/test?page=2",
+          //     "label": "2",
+          //     "active": false
+          //   },
+          //   {
+          //     "url": "http://clockin.vbox/test?page=3",
+          //     "label": "3",
+          //     "active": false
+          //   },
+          //   {
+          //     "url": "http://clockin.vbox/test?page=4",
+          //     "label": "4",
+          //     "active": false
+          //   },
+          //   {
+          //     "url": "http://clockin.vbox/test?page=5",
+          //     "label": "5",
+          //     "active": false
+          //   },
+          // ],
           // meta: {
           //   "current_page": 1,
           //   "from": 31,
