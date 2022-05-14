@@ -1,6 +1,6 @@
 {
-  "name": "zedeks-vue-inertial-datatable",
-  "version": "1.1.7",
+  "name": "zedeks-vue-inertia-datatable",
+  "version": "2.0.4",
   "description": "Datatable for VILT stack",
   "author": "Melchizedek Logosu (Zedeks)",
   "main": "dist/zedeks-vue-inertial-datatable.ssr.js",
@@ -21,6 +21,7 @@
     "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife"
   },
   "dependencies": {
+    "axios": "^0.27.2",
     "lodash": "^4.17.21"
   },
   "devDependencies": {

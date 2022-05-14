@@ -3,6 +3,9 @@ import {defineComponent} from 'vue';
 import {/*pickBy, */throttle,/* isEqual*/} from "lodash";
 import ZPagination from "@/z-pagination";
 import ZTableFooterCount from "@/z-table-footer-count";
+import ZTableActions from "@/z-table-actions";
+import ZTableFilterButtons from "@/z-table-filter-buttons";
+import ZTableTh from "@/z-table-th";
 
 export default /*#__PURE__*/defineComponent({
   name: "z-table",
@@ -12,8 +15,16 @@ export default /*#__PURE__*/defineComponent({
       required: true
     }
   },
-  components: {ZTableFooterCount, ZPagination},
+  components: {ZTableTh, ZTableFilterButtons, ZTableActions, ZTableFooterCount, ZPagination},
+  mounted() {
+    if (this.contains(this.getPageLength,'activeLength')){
+    this.table.pageLength = this.getPageLength.activeLength
+    }
+  },
   methods: {
+    contains(data, key) {
+      return Object.keys(data).includes(key)
+    },
     checkForMeta() {
       return Object.keys(this.backend.data).includes("meta")
     },
@@ -21,9 +32,6 @@ export default /*#__PURE__*/defineComponent({
       if (Object.keys(header).includes("sortable"))
         return header.sortable
       return false
-    },
-    contains(data, key) {
-      return Object.keys(data).includes(key)
     },
     //table loader
     startTableIsLoading() {
@@ -36,7 +44,8 @@ export default /*#__PURE__*/defineComponent({
     doAutoSearch() {
       // let query=this.table.search
       this.startTableIsLoading()
-      console.log(this.table.autoSearch)
+      let searchables=this.getHeaders.filter(h=> h.searchable===true)
+      this.$emit('autoSearch', {searchables,autoSearch: this.table.autoSearch})
       this.stopTableIsLoading()
 
     },
@@ -63,15 +72,47 @@ export default /*#__PURE__*/defineComponent({
     processActionRouteParams(params, data) {
       let processedParams = {};
       params.forEach((param, index) => {
-        processedParams[param.key]=data[param.value]
+        processedParams[param.key] = data[param.value]
       });
       return processedParams;
     },
-    actionRouting(route,params,type){
-      this.$emit('tableActionCalled',{route,params,type})
+    actionRouting(route, params, type) {
+      this.$emit('tableActionCalled', {route, params, type})
     },
-    showAction(index){
-      this.activeAction=index;
+    showAction(index) {
+      this.activeAction = index;
+    },
+    changeSortOrder(header) {
+      if (this.isHeaderSortable(header)) {
+        let key=header.sortKey??header.key
+        if (Object.keys(this.sortOrder).length && this.sortOrder.key === key) {
+          if (this.sortOrder.direction === "ASC") {
+            this.sortOrder.direction = "DESC"
+            this.$emit('sortOrder', this.sortOrder)
+            return;
+          }
+          if (this.sortOrder.direction === "DESC") {
+            this.sortOrder = {}
+            this.$emit('sortOrder', this.sortOrder)
+            return;
+          }
+        } else {
+          this.sortOrder = {
+            key: key,
+            direction: "ASC"
+          }
+        }
+        this.$emit('sortOrder', this.sortOrder)
+      }
+    },
+    doPageLengthChange() {
+      this.$emit('changePageLength', {pageLength: this.table.pageLength})
+    },
+    inExportActions(action) {
+      return this.getExports?.actions.includes(action)
+    },
+    doExport(action) {
+      this.$emit('exports', {type: action, data: this.getContents})
     }
   },
   watch: {
@@ -81,15 +122,17 @@ export default /*#__PURE__*/defineComponent({
     'table.autoSearch': {
       handler: throttle(function () {
         this.doAutoSearch();
-      }, 2000),
+      }, 500),
       deep: true,
     }
   },
   computed: {
     getPagination() {
       if (this.checkForMeta()) {
+        this.table.pageLength =this.backend.data.meta.per_page
         return this.backend.data.meta.links
       } else if (this.contains(this.backend.data, 'links')) {
+        this.table.pageLength =this.backend.data.per_page
         return this.backend.data.links
       }
       return [];
@@ -100,7 +143,7 @@ export default /*#__PURE__*/defineComponent({
         meta = this.backend.data.meta
         return ` ${meta.from} to ${meta.to} of ${meta.total}`
       } else if (this.contains(this.backend.data, 'links')) {
-        meta = this.backend.data.links
+        meta = this.backend.data
         return ` ${meta.from} to ${meta.to} of ${meta.total}`
       }
       return ` 1 to ${this.backend.data.data.length} of ${this.backend.data.data.length}`
@@ -109,7 +152,7 @@ export default /*#__PURE__*/defineComponent({
       return this.backend.headers
     },
     getContents() {
-      return this.backend.data?this.backend.data.data:{}
+      return this.backend.data ? this.backend.data.data : {}
     },
 
     //settings
@@ -129,8 +172,14 @@ export default /*#__PURE__*/defineComponent({
       }
       return this.defaultSettings["createSection"];
     },
-
-    getpageLength() {
+    getFilterSection() {
+      let custom = this.getSettings()
+      if (this.contains(custom, "tableFilter")) {
+        return custom.tableFilter
+      }
+      return this.defaultSettings["tableFilter"];
+    },
+    getPageLength() {
       let custom = this.getSettings()
       if (this.contains(custom, "pageLength")) {
         return custom.pageLength
@@ -150,13 +199,35 @@ export default /*#__PURE__*/defineComponent({
         return custom.actions
       }
       return this.defaultSettings["actions"];
-    }
+    },
+    getBulkActions() {
+      let custom = this.getSettings()
+      if (this.contains(custom, "bulkActions")) {
+        return custom.bulkActions
+      }
+      return this.defaultSettings["bulkActions"];
+    },
+    getExports() {
+      let custom = this.getSettings()
+      if (this.contains(custom, "exports")) {
+        return custom.exports
+      }
+      return this.defaultSettings["exports"];
+    },
+    getCheckBox() {
+      let custom = this.getSettings()
+      if (this.contains(custom, "checkbox")) {
+        return custom.checkbox
+      }
+      return this.defaultSettings["checkbox"];
+    },
 
   },
   data() {
     return {
+      sortOrder: {},
       tableSearch: "",
-      activeAction:null,
+      activeAction: null,
       table: {
         loading: false,
         search: "",
@@ -221,9 +292,21 @@ export default /*#__PURE__*/defineComponent({
         actions: {
           state: false,
           position: "row",// row / column-end /column-start
-          data: [
-
-          ]
+          data: []
+        },
+        tableFilter: {
+          state: false,
+          type: "button"
+        },
+        exports: {
+          state: false,
+          actions: ['pdf', 'xlsx', 'csv', 'print']
+        },
+        bulkActions: {
+          state: false,
+        },
+        checkbox:{
+          state: false,
         }
       },
     }
@@ -236,7 +319,7 @@ export default /*#__PURE__*/defineComponent({
     <!--      title and create button section-->
     <section class="mb-4 flex justify-between items-center">
       <!--        title of table-->
-      <div><span class="text-3xl font-bold" v-if="getTableTitle.state">{{ getTableTitle.label }}</span></div>
+      <div><span class="z-table-title" v-if="getTableTitle.state">{{ getTableTitle.label }}</span></div>
       <!--        button for create-->
       <div class="flex justify-end items-center">
         <a class="z-btn" v-if="getCreateSection.create.state" :href="getCreateSection.create.url">
@@ -256,13 +339,64 @@ export default /*#__PURE__*/defineComponent({
 
       </div>
     </section>
+
+    <!--exports and bulk actions-->
+    <section class="mb-4 flex justify-between items-center">
+      <div>
+        <select class="z-select" v-if="getBulkActions.state">
+          <option value="" selected>
+            Select Action
+          </option>
+          <option value="100">
+            something
+          </option>
+          <option value="100">
+            Delete
+          </option>
+        </select>
+      </div>
+      <!--        exports-->
+      <div>
+        <div class="flex justify-end items-center" v-if="getExports.state">
+          <span class="text-sm">Export To: </span>
+          <div class="group-btn-wrapper">
+          <button @click.prevent="doExport('pdf')" class="" v-show="inExportActions('pdf')">
+               <span>
+                 PDF
+               </span>
+            <!--            <i>I</i>-->
+          </button>
+          <button @click.prevent="doExport('xlsx')" class="" v-show="inExportActions('xlsx')">
+               <span>
+                 Excel
+               </span>
+            <!--            <i>I</i>-->
+          </button>
+          <button @click.prevent="doExport('csv')" class="" v-show="inExportActions('csv')">
+               <span>
+                 CSV
+               </span>
+            <!--            <i>I</i>-->
+          </button>
+          <button @click.prevent="doExport('print')" class="" v-show="inExportActions('print')">
+               <span>
+                 Print
+               </span>
+            <!--            <i>I</i>-->
+          </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!--      page length and search section-->
     <section class="mb-4 flex justify-between items-center">
       <div class="w-1/3">
-        <select v-if="getpageLength.state" v-model="table.pageLength" class="z-select w-32">
-          <option :value="pageLenth.key" v-for="(pageLenth, pageLenth_index) in getpageLength.options"
-                  :key="pageLenth_index">
-            {{ pageLenth.value }}
+        <select v-if="getPageLength.state" v-model="table.pageLength" class="z-select w-32"
+                @change="doPageLengthChange">
+          <option :value="pageLength.key" v-for="(pageLength, pageLength_index) in getPageLength.options"
+                  :key="pageLength_index">
+            {{ pageLength.label }}
           </option>
         </select>
       </div>
@@ -281,6 +415,12 @@ export default /*#__PURE__*/defineComponent({
     </section>
 
     <!--filter section-->
+    <section v-if="getFilterSection.state" class="mb-4">
+      <z-table-filter-buttons v-if="getFilterSection.type==='button'" :filters="getFilterSection.data"
+                              :active-filter="getFilterSection.activeFilter"
+                              @do-filter="(e)=> $emit('selectedButtonFilter', e)"/>
+
+    </section>
     <!--      <section class="mb-4 flex justify-between items-center">-->
     <!--        <div>-->
 
@@ -307,91 +447,55 @@ export default /*#__PURE__*/defineComponent({
     <!--          </select>-->
     <!--        </div>-->
     <!--      </section>-->
-    <!--exports and bulk actions-->
-    <!--      <section class="mb-4 flex justify-between items-center">-->
-    <!--        <div>-->
-    <!--          <select class="z-select">-->
-    <!--            <option value="" selected>-->
-    <!--              Select Action-->
-    <!--            </option>-->
-    <!--            <option value="100">-->
-    <!--              something-->
-    <!--            </option>-->
-    <!--            <option value="100">-->
-    <!--              Delete-->
-    <!--            </option>-->
-    <!--          </select>-->
-    <!--        </div>-->
-    <!--        &lt;!&ndash;        exports&ndash;&gt;-->
-    <!--        <div class="flex justify-end items-center">-->
-    <!--          <span class="text-sm">Export To: </span>-->
-    <!--          <button class="z-btn-sm">-->
-    <!--           <span>-->
-    <!--             PDF-->
-    <!--           </span>-->
-    <!--            &lt;!&ndash;            <i>I</i>&ndash;&gt;-->
-    <!--          </button>-->
-    <!--          <button class="z-btn-sm">-->
-    <!--           <span>-->
-    <!--             Excel-->
-    <!--           </span>-->
-    <!--            &lt;!&ndash;            <i>I</i>&ndash;&gt;-->
-    <!--          </button>-->
-    <!--          <button class="z-btn-sm">-->
-    <!--           <span>-->
-    <!--             CSV-->
-    <!--           </span>-->
-    <!--            &lt;!&ndash;            <i>I</i>&ndash;&gt;-->
-    <!--          </button>-->
-    <!--          <button class="z-btn-sm">-->
-    <!--           <span>-->
-    <!--             Print-->
-    <!--           </span>-->
-    <!--            &lt;!&ndash;            <i>I</i>&ndash;&gt;-->
-    <!--          </button>-->
-    <!--        </div>-->
-    <!--      </section>-->
+
     <div class="relative">
       <div v-if="table.loading" class=" z-table-loader-wrapper">
         <p class="">Loading...</p>
       </div>
-      <table class="z-table ">
+      <table class="z-table">
         <!--       table header section -->
         <thead class="z-table-header ">
-        <tr class="">
-          <th class="py-4 px-6" v-for="(header, header_index) in getHeaders" :key="header_index">
-
+        <tr class="z-table-header-tr">
+          <th scope="col" class="z-table-header-tr-th" v-if="getActions.state && getActions.position==='column-start'">
             <div class="flex justify-between items-center">
-             <span>
-              {{ header.label }}
+              <span>
+              Actions
             </span>
-              <div class="flex justify-end" v-if="isHeaderSortable(header)">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-6" fill="none" viewBox="0 0 24 24"
-                     stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 7l4-4m0 0l4 4m-4-4v18"/>
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-6" fill="none" viewBox="0 0 24 24"
-                     stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M16 17l-4 4m0 0l-4-4m4 4V3"/>
+            </div>
+          </th>
+          <th v-if="getCheckBox.state">
+            <div class="bg-gray-200 rounded-sm w-4 h-4 flex flex-shrink-0 justify-center items-center relative">
+              <input type="checkbox" class="focus:opacity-100 checkbox opacity-0 absolute cursor-pointer w-full h-full">
+              <div class="check-icon hidden bg-indigo-700 text-white rounded-sm">
+                <svg class="icon icon-tabler icon-tabler-check" xmlns="http://www.w3.org/2000/svg" width="20"
+                     height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z"></path>
+                  <path d="M5 12l5 5l10 -10"></path>
                 </svg>
               </div>
             </div>
-            <!--            <div class="bg-gray-200 rounded-sm w-4 h-4 flex flex-shrink-0 justify-center items-center relative">-->
-            <!--              <input type="checkbox" class="focus:opacity-100 checkbox opacity-0 absolute cursor-pointer w-full h-full">-->
-            <!--              <div class="check-icon hidden bg-indigo-700 text-white rounded-sm">-->
-            <!--                <svg class="icon icon-tabler icon-tabler-check" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">-->
-            <!--                  <path stroke="none" d="M0 0h24v24H0z"></path>-->
-            <!--                  <path d="M5 12l5 5l10 -10"></path>-->
-            <!--                </svg>-->
-            <!--              </div>-->
-            <!--            </div>-->
+          </th>
+          <th scope="col" class="z-table-header-tr-th" :class="{'cursor-pointer':isHeaderSortable(header)}"
+              v-for="(header, header_index) in getHeaders" :key="header_index">
+
+            <z-table-th :header="header" :sort-order="sortOrder"
+                        :is-header-sortable="isHeaderSortable(header)"
+                        @change-sort-order="changeSortOrder(header)"/>
+          </th>
+          <th scope="col" class="z-table-header-tr-th" v-if="getActions.state && getActions.position==='column-end'">
+            <div class="flex justify-between items-center">
+              <span>
+              Actions
+            </span>
+            </div>
           </th>
         </tr>
         </thead>
         <!--       table body section -->
-        <tbody class="">
+        <tbody class="z-table-body">
         <template v-if="getContents" v-for="(content, content_index) in getContents" :key="content_index">
-          <tr class="border-b z-tr-hover" @mouseover="showAction(content_index)" @mouseleave="activeAction=null">
+          <tr class="z-table-body-tr z-tr-hover " @mouseover="showAction(content_index)" @mouseleave="activeAction=null">
             <!--          <td class="py-4 px-6">-->
             <!--            <div class="bg-gray-200 rounded-sm w-4 h-4 flex flex-shrink-0 justify-center items-center relative">-->
             <!--              <input type="checkbox" class="focus:opacity-100 checkbox opacity-0 absolute cursor-pointer w-full h-full">-->
@@ -405,7 +509,12 @@ export default /*#__PURE__*/defineComponent({
             <!--              </div>-->
             <!--            </div>-->
             <!--          </td>-->
-            <td v-for="(header, header_index) in getHeaders" :key="header_index" class="py-3 px-5 ">
+
+            <z-table-actions
+                @child-action-routing="(e)=>actionRouting(e.route,processActionRouteParams(e.params,content),e.type)"
+                v-if="getActions.state && getActions.position==='column-start'" :position="getActions.position"
+                :data="getActions.data"/>
+            <td v-for="(header, header_index) in getHeaders" :key="header_index" class="z-table-body-tr-td ">
               <!--            <div v-if="badges && badges[header_index]">-->
               <!--              <x-badge v-if="badges[header_index][content[header_index]]"-->
               <!--                       :class="badges[header_index][content[header_index]].color + ' text-white '">-->
@@ -414,15 +523,24 @@ export default /*#__PURE__*/defineComponent({
               <!--            </div>-->
 
               <!--            <div v-else>-->
-              <div v-html="content[header.key]"></div>
+              <template v-if="header.slot">
+                <slot :name="header.key" :content="content">
+                </slot>
+              </template>
+              <template v-else>
+                <div v-if="header.type==='html'" v-html="content[header.key]"></div>
+                <div v-else v-text="content[header.key]"></div>
+              </template>
+
               <template v-if="getActions.state">
-                <div v-if="getActions.position==='row' && header_index===0" class="mt-2 mb-1 " :class="{'block ':activeAction===content_index,'hidden':activeAction!==content_index}">
+                <div v-if="getActions.position==='row' && header_index===getActions.rowIndex" class="mt-2 mb-1 "
+                     :class="{'block ':activeAction===content_index,'hidden':activeAction!==content_index}">
                   <div>
                     <ul class="flex justify-start items-center space-x-2 z-tr-actions">
                       <li v-for="(action, action_index) in getActions.data" :key="action_index">
                         <a href=""
                            @click.prevent="actionRouting(action.route_name,processActionRouteParams(action.params,content),action.request_type)">
-                          {{action.label}}
+                          {{ action.label }}
                         </a>
                       </li>
                     </ul>
@@ -432,12 +550,16 @@ export default /*#__PURE__*/defineComponent({
 
               <!--            </div>-->
             </td>
-
+            <z-table-actions
+                @child-action-routing="(e)=>actionRouting(e.route,processActionRouteParams(e.params,content),e.type)"
+                v-if="getActions.state && getActions.position==='column-end'" :position="getActions.position"
+                :data="getActions.data"/>
           </tr>
+          <tr class="h-3"></tr>
         </template>
         </tbody>
       </table>
-      <div v-if="!getContents" class="w-full text-center text-sm font-medium py-3">No Record Found</div>
+      <div v-if="getContents.length===0" class="w-full text-center text-sm font-medium py-3">No Record Found</div>
     </div>
 
     <!--footer-->
@@ -445,7 +567,7 @@ export default /*#__PURE__*/defineComponent({
       <!--        count-->
       <z-table-footer-count :count="getTableCount"/>
       <!--        pagination-->
-      <z-pagination :links="getPagination"/>
+      <z-pagination :links="getPagination" @pagination="(e)=> $emit('pagination',e)"/>
     </section>
   </div>
 </template>
