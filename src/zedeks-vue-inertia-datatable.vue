@@ -112,7 +112,7 @@ export default /*#__PURE__*/defineComponent({
       return this.getExports?.actions.includes(action)
     },
     doExport(action) {
-      this.$emit('exports', {type: action, data: this.getContents})
+      this.$emit('exports', {element:this.$refs["z-table"], type: action, data: this.getContents})
     }
   },
   watch: {
@@ -452,7 +452,7 @@ export default /*#__PURE__*/defineComponent({
       <div v-if="table.loading" class=" z-table-loader-wrapper">
         <p class="">Loading...</p>
       </div>
-      <table class="z-table">
+      <table class="z-table" id="z-table" ref="z-table">
         <!--       table header section -->
         <thead class="z-table-header ">
         <tr class="z-table-header-tr">
@@ -513,7 +513,7 @@ export default /*#__PURE__*/defineComponent({
             <z-table-actions
                 @child-action-routing="(e)=>actionRouting(e.route,processActionRouteParams(e.params,content),e.type)"
                 v-if="getActions.state && getActions.position==='column-start'" :position="getActions.position"
-                :data="getActions.data"/>
+                :data="getActions.data" :table-content="content"/>
             <td v-for="(header, header_index) in getHeaders" :key="header_index" class="z-table-body-tr-td ">
               <!--            <div v-if="badges && badges[header_index]">-->
               <!--              <x-badge v-if="badges[header_index][content[header_index]]"-->
@@ -553,7 +553,7 @@ export default /*#__PURE__*/defineComponent({
             <z-table-actions
                 @child-action-routing="(e)=>actionRouting(e.route,processActionRouteParams(e.params,content),e.type)"
                 v-if="getActions.state && getActions.position==='column-end'" :position="getActions.position"
-                :data="getActions.data"/>
+                :data="getActions.data" :table-content="content"/>
           </tr>
           <tr class="h-3"></tr>
         </template>

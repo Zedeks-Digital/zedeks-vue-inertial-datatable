@@ -29,7 +29,7 @@
 <script>
 import {defineComponent} from 'vue';
 import axios from 'axios'
-import ZTable from '@/zedeks-vue-inertial-datatable.vue';
+import ZTable from '@/zedeks-vue-inertia-datatable.vue';
 
 export default defineComponent({
   name: 'ServeDev',
@@ -37,12 +37,12 @@ export default defineComponent({
     ZTable
   },
   mounted() {
-    this.getData()
+    // this.getData()
   },
   methods: {
     getData() {
       axios.get('http://saprfacility.vbox/api/all-users')
-          .then(response => (this.backend.data = response.data))
+          .then(response => (console.log(response.data)/*this.backend.data = response.data*/))
     },
     doSomething(data) {
       return data + " mel"
@@ -83,7 +83,7 @@ export default defineComponent({
             label: "ID",
             key: "id",
             sortable: true,
-            sortKey:"id",
+            sortKey: "id",
             searchable: true,
             searchableKey: "id",
             // exportable: false,
@@ -93,7 +93,7 @@ export default defineComponent({
             label: "Name",
             key: "full_name",
             sortable: true,
-            sortKey:"first_name",
+            sortKey: "first_name",
           },
           {
             label: "Country",
@@ -117,6 +117,7 @@ export default defineComponent({
           data: [
             {
               "id": 1,
+              "status": true,
               "created_at": "2020-01-01T16:13:41.000000Z",
               "updated_at": "2020-01-01T16:13:41.000000Z",
               "region": 1,
@@ -124,6 +125,7 @@ export default defineComponent({
             },
             {
               "id": 2,
+              "status": true,
               "created_at": "2020-01-01T16:13:41.000000Z",
               "updated_at": "2020-01-01T16:13:41.000000Z",
               "region": 1,
@@ -131,6 +133,7 @@ export default defineComponent({
             },
             {
               "id": 3,
+              "status": false,
               "created_at": "2020-01-01T16:13:41.000000Z",
               "updated_at": "2020-01-01T16:13:41.000000Z",
               "region": 1,
@@ -291,6 +294,19 @@ export default defineComponent({
                     value: "id"
                   }
                 ],
+                condition: {
+                  'check': 'status',
+                  'if': true,
+                  'then': {
+                    label: 'Deactivate',
+                    route: "user.show"
+                  },
+                  'else': {
+                    'label': 'Activate',
+                    route: "user.show"
+                  },
+                }
+                ,
                 request_type: "get"
               },
               {

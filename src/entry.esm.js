@@ -1,6 +1,6 @@
 
 // Import vue component
-import component from '@/zedeks-vue-inertial-datatable.vue';
+import component from '@/zedeks-vue-inertia-datatable.vue';
 
 // Default export is installable instance of component.
 // IIFE injects install function into component, allowing component
