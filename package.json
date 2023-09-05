@@ -1,56 +1,46 @@
 {
-  "name": "zedeks-vue-inertia-datatable",
-  "version": "2.1.0",
-  "description": "Datatable for VILT stack",
+  "name": "@mel-zedeks/coordy-vue",
+  "version": "3.0.0",
+  "description": "Coordy is a smart Datatable | this is the Vue version supports REST APIs / Inertia.js (Laravel - VILT) as backend",
   "author": "Melchizedek Logosu (Mel-Zedeks)",
-  "main": "dist/zedeks-vue-inertial-datatable.ssr.js",
-  "browser": "dist/zedeks-vue-inertial-datatable.esm.js",
-  "module": "dist/zedeks-vue-inertial-datatable.esm.js",
-  "unpkg": "dist/zedeks-vue-inertial-datatable.min.js",
+  "type": "module",
+  "main": "dist/coordy-vue.cjs",
+  "browser": "dist/coordy-vue.esm.js",
+  "module": "dist/coordy-vue.esm.js",
+  "unpkg": "dist/coordy-vue.iife.js",
   "files": [
-    "dist/*",
-    "src/**/*.vue"
+    "dist"
   ],
+  "exports": {
+    ".": {
+      "import": "./dist/coordy-vue.esm.js",
+      "require": "./dist/coordy-vue.cjs"
+    },
+    "./dist/coordy-vue.css": "./dist/coordy-vue.css"
+  },
   "sideEffects": false,
   "scripts": {
-    "serve": "vue-cli-service serve dev/serve.js",
-    "prebuild": "rimraf ./dist",
-    "build": "cross-env NODE_ENV=production rollup --config build/rollup.config.js",
-    "build:ssr": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format cjs",
-    "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es",
-    "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife"
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "axios": "^0.27.2",
-    "lodash": "^4.17.21"
+
   },
   "devDependencies": {
-    "@babel/core": "^7.14.6",
-    "@babel/preset-env": "^7.14.7",
-    "@rollup/plugin-alias": "^3.1.2",
-    "@rollup/plugin-babel": "^5.3.0",
-    "@rollup/plugin-commonjs": "^14.0.0",
-    "@rollup/plugin-node-resolve": "^9.0.0",
-    "@rollup/plugin-replace": "^2.4.2",
-    "@vue/cli-plugin-babel": "^4.5.13",
-    "@vue/cli-service": "^4.5.13",
-    "@vue/compiler-sfc": "^3.0.11",
-    "autoprefixer": "^10.4.4",
-    "cross-env": "^7.0.3",
-    "minimist": "^1.2.5",
-    "postcss": "^8.4.12",
-    "rimraf": "^3.0.2",
-    "rollup": "^2.52.8",
-    "rollup-plugin-postcss": "^4.0.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-vue": "^6.0.0",
-    "tailwindcss": "^3.0.23",
-    "vue": "^3.0.5"
+    "@vitejs/plugin-vue": "^4.3.4",
+    "autoprefixer": "^10.4.15",
+    "axios": "^0.27.2",
+    "lodash": "^4.17.21",
+    "postcss": "^8.4.28",
+    "tailwindcss": "^3.3.3",
+    "vite": "^4.4.9",
+    "vue": "^3.2.47"
   },
   "peerDependencies": {
-    "vue": "^3.0.5"
+    "vue": "^3.2.47"
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=18"
   }
 }

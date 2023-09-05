@@ -1,11 +1,11 @@
 <script>
 import {defineComponent} from 'vue';
 import {/*pickBy, */throttle,/* isEqual*/} from "lodash";
-import ZPagination from "@/z-pagination";
-import ZTableFooterCount from "@/z-table-footer-count";
-import ZTableActions from "@/z-table-actions";
-import ZTableFilterButtons from "@/z-table-filter-buttons";
-import ZTableTh from "@/z-table-th";
+import ZPagination from "@/Components/Table/c-pagination.vue";
+import ZTableFooterCount from "@/Components/Table/c-content-counter.vue";
+import ZTableActions from "@/Components/z-table-actions.vue";
+import ZTableFilterButtons from "@/Components/z-table-filter-buttons.vue";
+import ZTableTh from "@/Components/z-table-th.vue";
 
 export default /*#__PURE__*/defineComponent({
   name: "z-table",

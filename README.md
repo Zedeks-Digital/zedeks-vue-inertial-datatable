@@ -1,29 +1,34 @@
-## Welcome to Zedeks Vue Inertia Datatable!
+## Coordy - Vue
 
-This is a package to help you build applications **VILT (Vue, Inertia, Laravel Tailwind css)** fast without having to worry about things like
-* Re-creating tables and styling them
-* Dealing with paginations
+> Coordy is a smart Datatable that supports REST APIs / Inertia.js (Laravel - VILT) as backends
+
+This package to help you build **Vue Or VILT (Vue, Inertia, Laravel Tailwind css)** applications faster without having to worry about things like
+
+* Re-creating tables and styling each table
+* Dealing with manual pagination.
 * Table search
 * Table Exports [print, csv, xlxs, pdf]
 * Table filters
-* create links / route on tables
-* and more .
+* add new buttons or links
+* table actions like [edit, view, etc], supports string or object route construction
+* Use Text, Links, Html or Vue Components in the table with slots.
+* and more
 
 ## Installation
 install using NPM
 
 ```shell
-npm i zedeks-vue-inertial-datatable
+npm i @mel-zedeks/coordy-vue
 ```
 
-import into your vue 3 "resources/js/app.js"
+import into your vue 3 "main.js" or "resources/js/app.js"
 
 ```javascript
-import ZTable from 'zedeks-vue-inertial-datatable'
+import CoordyDataTable from '@mel-zedeks/coordy-vue'
 ```
 use as component 
 ```javascript
- .component('ZTable',ZTable)
+ app.component('CoordyDataTable',CoordyDataTable)
 ```
 
 full code for vue 3 "resources/js/app.js" should look like this.
@@ -31,7 +36,7 @@ full code for vue 3 "resources/js/app.js" should look like this.
 import {createApp, h} from 'vue'
 import {createInertiaApp} from '@inertiajs/inertia-vue3'
 
-import ZTable from 'zedeks-vue-inertial-datatable' // this place
+import CoordyDataTable from '@mel-zedeks/coordy-vue' // this place
 import store from "./store/index"
 
 createInertiaApp({
@@ -45,7 +50,7 @@ createInertiaApp({
             })
             .use(plugin)
             .use(store)
-            .component('ZTable',ZTable) // this place
+            .component('CoordyDataTable',CoordyDataTable) // this place
             .mount(el)
     },
 })
